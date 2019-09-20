@@ -1,21 +1,39 @@
 const express = require("express");
+const mapquest = require("mapquest");
+const DarkSky = require("dark-sky");
 const router = express.Router();
+
+const darksky = new DarkSky("1888ea10d69f1a2cd8a4b3554fa1942e");
 
 router.get("/", (req, res) => {
   res.send("Home Page for Weather Application");
 });
-let address = "";
+
 router.post("/", (req, res) => {
-  address = req.body.address;
-  res.send(address);
+  const address = req.body.address;
+  mapquest.geocode(
+    { address: address, key: "AaRK24xJjIIuEXHr2QcGKn9FGNZynzIN" },
+    (err, location) => {
+      darksky
+        .coordinates({ lat: location.latLng.lat, lng: location.latLng.lng })
+        .units("ca")
+        .get()
+        .then(result => {
+          res.send(result.currently);
+        })
+        .catch(err => {
+          console.log("Error in dark sky: ", err);
+        });
+    }
+  );
 });
 
 router.get("/address", (req, res) => {
-  const addressKey = encodeURIComponent(address);
-  const geocodeUrl = `http://www.mapquestapi.com/geocoding/v1/address?key=AaRK24xJjIIuEXHr2QcGKn9FGNZynzIN&location=${addressKey}`;
-  res.redirect(geocodeUrl);
-  //   console.log(res.result);
-  //   res.send(address);
+  res.send(req.body);
+});
+
+router.get("/result", (req, res) => {
+  res.send(req.body);
 });
 
 module.exports = router;
