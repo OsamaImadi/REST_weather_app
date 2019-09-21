@@ -1,6 +1,7 @@
 const express = require("express");
 const mapquest = require("mapquest");
 const DarkSky = require("dark-sky");
+const moment = require("moment");
 const router = express.Router();
 
 const darksky = new DarkSky("1888ea10d69f1a2cd8a4b3554fa1942e");
@@ -19,6 +20,7 @@ router.post("/", (req, res) => {
         .units("ca")
         .get()
         .then(result => {
+          console.log(moment(result.currently.time).format("h:mm:ss"));
           res.send(result.currently);
         })
         .catch(err => {
